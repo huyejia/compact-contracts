@@ -1,5 +1,5 @@
 {
-  "name": "@openzeppelin-midnight-contracts/initializable-contract",
+  "name": "@openzeppelin-midnight-contracts/erc20-contract",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -13,10 +13,10 @@
     }
   },
   "scripts": {
-    "compact": "run-compactc src/initializable.compact ./src/managed/initializable",
+    "compact": "run-compactc src/erc20.compact ./src/managed/erc20",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "prepack": "yarn build",
-    "build": "rm -rf dist && tsc --project tsconfig.build.json && cp -Rf ./src/managed ./dist/managed && cp ./src/initializable.compact ./dist",
+    "build": "rm -rf dist && tsc --project tsconfig.build.json && cp -Rf ./src/managed ./dist/managed && cp ./src/erc20.compact ./dist",
     "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

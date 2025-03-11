@@ -1,0 +1,80 @@
+pragma language_version >= 0.14.0;
+
+import CompactStandardLibrary;
+
+export { CoinInfo, ZswapCoinPublicKey, ContractAddress };
+
+//
+// State
+//
+
+export ledger counter: Counter;
+export ledger nonce: Bytes<32>;
+export ledger totalSupply: Uint<128>;
+export sealed ledger domain: Bytes<32>;
+export sealed ledger name: Maybe<Opaque<"string">>;
+export sealed ledger symbol: Maybe<Opaque<"string">>;
+export sealed ledger decimals: Uint<8>;
+export ledger info: CoinInfo; // for testing
+export ledger tokenType: Bytes<32>;
+
+constructor(
+  initNonce: Bytes<32>,
+  _name: Maybe<Opaque<"string">>,
+  _symbol: Maybe<Opaque<"string">>,
+  _decimals:Uint<8>
+) {
+  nonce = initNonce;
+  domain = pad(32, "ERC20");
+  tokenType = token_type(domain, kernel.self());
+  name = _name;
+  symbol = _symbol;
+  decimals = _decimals;
+}
+
+/// For testing
+export circuit mintToCaller(amount: Uint<128>): [] {
+  const caller = own_public_key();
+  return mint(left<ZswapCoinPublicKey, ContractAddress>(caller), amount);
+}
+
+/// Mints `amount` tokens to `recipient`.
+/// This circuit does not include access control meaning anyone call it if exported.
+export circuit mint(recipient: Either<ZswapCoinPublicKey, ContractAddress>, amount: Uint<128>): [] {
+  counter.increment(1);
+  const newNonce = evolve_nonce(counter, nonce);
+  nonce = newNonce;
+  const ret = mint_token(domain, amount, nonce, recipient);
+  info = ret;
+  totalSupply = totalSupply + amount as Uint<128>;
+}
+
+/// Destroys `amount` of `coin` by sending it to `burn_address`.
+/// This circuit does not include access control meaning anyone can call it if exported.
+export circuit burn(coin: CoinInfo, amount: Uint<128>): SendResult {
+  assert coin.color == tokenType "Token not created from this contract";
+  assert coin.value >= amount "Insufficient token amount to burn";
+
+  receive(coin);
+  totalSupply = totalSupply - amount;
+
+  const sendRes = send_immediate(coin, burn_address(), amount);
+  if (sendRes.change.is_some) {
+    // tmp for only zswap because we should be able to handle contracts burning tokens
+    // and returning change.
+    const tmpAddr = left<ZswapCoinPublicKey, ContractAddress>(own_public_key());
+    send_immediate(sendRes.change.value, tmpAddr, sendRes.change.value.value);
+  }
+
+  return sendRes;
+}
+
+export circuit thisAddress(): ContractAddress {
+  return kernel.self();
+}
+
+/// Transfers `amount` tokens from this contract to `recipient`.
+/// This circuit does not include access control meaning anyone can call it if exported.
+export circuit transfer(recipient: Either<ZswapCoinPublicKey, ContractAddress>, amount: Uint<128>): [] {
+  // send();
+}

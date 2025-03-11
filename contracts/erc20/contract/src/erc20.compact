@@ -4,10 +4,7 @@ import CompactStandardLibrary;
 
 export { CoinInfo, ZswapCoinPublicKey, ContractAddress };
 
-//
-// State
-//
-
+/// Public ledger
 export ledger counter: Counter;
 export ledger nonce: Bytes<32>;
 export ledger totalSupply: Uint<128>;
@@ -18,6 +15,15 @@ export sealed ledger decimals: Uint<8>;
 export ledger info: CoinInfo; // for testing
 export ledger tokenType: Bytes<32>;
 
+/**
+ * @description Initializes the contract by storing the domain and setting
+ * the initial nonce and token metadata.
+ *
+ * @param initNonce - The starting nonce for token mints.
+ * @param _name - The name of the token.
+ * @param _symbol - The symbol of the token.
+ * @param _decimals - The number of decimals used to get the user representation.
+ */
 constructor(
   initNonce: Bytes<32>,
   _name: Maybe<Opaque<"string">>,
@@ -38,8 +44,16 @@ export circuit mintToCaller(amount: Uint<128>): [] {
   return mint(left<ZswapCoinPublicKey, ContractAddress>(caller), amount);
 }
 
-/// Mints `amount` tokens to `recipient`.
-/// This circuit does not include access control meaning anyone call it if exported.
+/**
+ * @description Mints `amount` tokens to `recipient`. Increments the counter, evolves
+ * the nonce, and updates totalSupply.
+ *
+ * @dev This currently does NOT include access control.
+ *
+ * @param recipient - The starting nonce for token mints.
+ * @param amount - The name, symbol, and decimals to be stored.
+ * @return CoinInfo - The created coin description.
+ */
 export circuit mint(recipient: Either<ZswapCoinPublicKey, ContractAddress>, amount: Uint<128>): [] {
   counter.increment(1);
   const newNonce = evolve_nonce(counter, nonce);
@@ -49,8 +63,20 @@ export circuit mint(recipient: Either<ZswapCoinPublicKey, ContractAddress>, amou
   totalSupply = totalSupply + amount as Uint<128>;
 }
 
-/// Destroys `amount` of `coin` by sending it to `burn_address`.
-/// This circuit does not include access control meaning anyone can call it if exported.
+/**
+ * @description Receives `coin` and destroys `amount` by sending the coin to the
+ * burn address. If there is change, the change is returned to the caller.
+ *
+ * Requirements:
+ *   - Coin color is equal to the token type..
+ *   - Coin value is greater than or equal to `amount`.
+ *
+ * @dev This currently does NOT include access control.
+ *
+ * @param coin - The coin description to burn.
+ * @param amount - The amount of tokens to burn.
+ * @return SendResult - Description of the created coin along with the change, if applicable.
+ */
 export circuit burn(coin: CoinInfo, amount: Uint<128>): SendResult {
   assert coin.color == tokenType "Token not created from this contract";
   assert coin.value >= amount "Insufficient token amount to burn";
@@ -73,8 +99,20 @@ export circuit thisAddress(): ContractAddress {
   return kernel.self();
 }
 
-/// Transfers `amount` tokens from this contract to `recipient`.
-/// This circuit does not include access control meaning anyone can call it if exported.
+/**
+ * @description Transfers `amount` tokens to `recipient` from the contract.
+ *
+ * Requirements:
+ *   - The contract balance must be greater than or equal to `amount`.
+ *   - If `recipient` is a contract address, asserts that the contract
+ *     can safely receive tokens.
+ *
+ * @dev This currently does NOT include access control.
+ *
+ * @param recipient - The recipient of the transfer.
+ * @param amount - The amount of the transfer.
+ * @return SendResult - Description of the created coin.
+ */
 export circuit transfer(recipient: Either<ZswapCoinPublicKey, ContractAddress>, amount: Uint<128>): [] {
   // send();
 }

@@ -1113,6 +1113,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openzeppelin-midnight-contracts/erc20_unshielded-contract@workspace:contracts/erc20_unshielded/contract":
+  version: 0.0.0-use.local
+  resolution: "@openzeppelin-midnight-contracts/erc20_unshielded-contract@workspace:contracts/erc20_unshielded/contract"
+  dependencies:
+    "@midnight-ntwrk/compact": "workspace:*"
+    eslint: "npm:^8.52.0"
+    jest: "npm:^29.7.0"
+    typescript: "npm:^5.2.2"
+  languageName: unknown
+  linkType: soft
+
 "@openzeppelin-midnight-contracts/initializable-contract@workspace:contracts/initializable/contract":
   version: 0.0.0-use.local
   resolution: "@openzeppelin-midnight-contracts/initializable-contract@workspace:contracts/initializable/contract"

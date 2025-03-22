@@ -1,9 +1,7 @@
 import { type CircuitContext, QueryContext, sampleContractAddress, constructorContext } from '@midnight-ntwrk/compact-runtime';
 import { Contract, type Ledger, ledger, ZswapCoinPublicKey, ContractAddress, Either } from '../managed/erc20_unshielded/contract/index.cjs';
-
 import { type ERC20PrivateState, witnesses } from '../witnesses.js';
-import { ZswapOrContractAddress, MaybeString } from './types.js';
-import { decodeContractAddress, encodeContractAddress, encodeCoinPublicKey } from '@midnight-ntwrk/ledger';
+import { MaybeString } from './types.js';
 
 export class ERC20Mock {
   readonly contract: Contract<ERC20PrivateState>;

@@ -1,13 +1,8 @@
 import { it, describe, expect } from '@jest/globals';
 import { ERC20Mock } from './erc20-setup.js';
 import { NetworkId, setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
-import { MaybeString, ZOrAddress } from './types.js';
+import { MaybeString } from './types.js';
 import * as utils from './utils';
-import { sampleCoinPublicKey, sampleContractAddress } from '@midnight-ntwrk/ledger';
-import { toHex } from '@midnight-ntwrk/midnight-js-utils';
-import { encodeTokenType, encodeCoinInfo, encodeContractAddress, decodeCoinInfo, decodeTokenType, decodeContractAddress, tokenType, ContractAddress } from '@midnight-ntwrk/onchain-runtime';
-import { convert_bigint_to_Uint8Array, CoinPublicKey, encodeCoinPublicKey } from '@midnight-ntwrk/compact-runtime';
-import * as Compact from '../managed/erc20_unshielded/contract/index.cjs';
 
 //
 // Test vals
@@ -30,8 +25,10 @@ const DECIMALS: bigint = 18n;
 const AMOUNT: bigint = BigInt(250);
 const MAX_UINT64 = BigInt(2**64) - BigInt(1);
 const MAX_UINT256 = BigInt(2**256) - BigInt(1);
-const ALICE = utils.createEitherTestUser('ALICE');
-const BOB = utils.createEitherTestUser('BOB');
+
+const OWNER = utils.createEitherTestUser('OWNER');
+const RECIPIENT = utils.createEitherTestUser('RECIPIENT');
+const SPENDER = utils.createEitherTestUser('SPENDER');
 const SOME_CONTRACT = utils.createEitherTestContractAddress('SOME_CONTRACT');
 
 //
@@ -69,14 +66,25 @@ describe('ERC20', () => {
     });
   });
 
+  describe('approve', () => {
+    it.skip('should approve', () => {
+      // TODO: need to init mapping
+      const initAllowance = token.allowance(OWNER, SPENDER);
+      expect(initAllowance).toEqual(0n);
+
+      token._mint(OWNER, AMOUNT);
+      token.approve(SPENDER, AMOUNT);
+    });
+  })
+
   describe('mint', () => {
     it('should mint and update supply', () => {
       const initSupply = token.getLedger().totalSupply;
       expect(initSupply).toEqual(0n);
 
-      token._mint(ALICE, AMOUNT);
+      token._mint(RECIPIENT, AMOUNT);
       expect(token.getLedger().totalSupply).toEqual(AMOUNT);
-      expect(token.balanceOf(ALICE)).toEqual(AMOUNT);
+      expect(token.balanceOf(RECIPIENT)).toEqual(AMOUNT);
     });
 
     it('should not mint to zero pubkey', () => {

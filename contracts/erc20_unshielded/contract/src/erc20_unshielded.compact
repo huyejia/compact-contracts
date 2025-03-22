@@ -110,11 +110,6 @@ export circuit transferFrom(
   return true;
 }
 
-Sets a `value` amount of tokens as the allowance of `spender` over the
-     * caller's tokens.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-
 /**
  * @description Sets a `value` amount of tokens as allowance of `spender` over the caller's tokens.
  *

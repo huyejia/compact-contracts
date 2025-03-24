@@ -2,8 +2,6 @@ import { type CircuitContext, QueryContext, sampleContractAddress, constructorCo
 import { Contract, type Ledger, ledger } from '../managed/initializable/contract/index.cjs';
 import { type InitializablePrivateState, witnesses } from '../witnesses.js';
 
-// This is over-kill for such a simple contract, but the same pattern can be used to test more
-// complex contracts.
 export class InitializableMock {
   readonly contract: Contract<InitializablePrivateState>;
   circuitContext: CircuitContext<InitializablePrivateState>;

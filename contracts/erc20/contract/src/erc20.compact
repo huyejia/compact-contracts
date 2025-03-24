@@ -174,8 +174,8 @@ export circuit _transfer(
  * @description Creates a `value` amount of tokens and assigne them to `account`,
  * by transferring it from the zero address. Relies on the `update` mechanism.
  *
- * @param {account} - .
- * @param {value} - .
+ * @param {account} - The recipient of tokens minted.
+ * @param {value} - The amount of tokens minted.
  * @return {[]} - None.
  */
 export circuit _mint(
@@ -194,8 +194,8 @@ export circuit _mint(
  * @description Destroys a `value` amount of tokens from `account`, lowering the total supply.
  * Relies on the `_update` mechanism.
  *
- * @param {account} - .
- * @param {value} - .
+ * @param {account} - The target owner of tokens to burn.
+ * @param {value} - The amount of tokens to burn.
  * @return {[]} - None.
  */
 export circuit _burn(
@@ -211,12 +211,11 @@ export circuit _burn(
 
 /**
  * @description Transfers a `value` amount of tokens from `from` to `to`, or alternatively mints (or burns) if `from`
- * (or `to`) is the zero address. All customizations to transfers, mints, and burns should be done by overriding
- * this function.
+ * (or `to`) is the zero address.
  *
- * @param {from} - .
- * @param {to} - .
- * @param {value} - .
+ * @param {from} - The original owner of the tokens moved (which is 0 if tokens are minted).
+ * @param {to} - The recipient of the tokens moved (which is 0 if tokens are burned).
+ * @param {value} - The amount of tokens moved from `from` to `to`.
  * @return {[]} - None.
  */
 export circuit _update(
@@ -250,9 +249,9 @@ export circuit _update(
  * @description Updates `owner`'s allowance for `spender` based on spent `value`.
  * Does not update the allowance value in case of infinite allowance.
  *
- * @param {owner} - .
- * @param {spender} - .
- * @param {value} - .
+ * @param {owner} - The owner of the tokens.
+ * @param {spender} - The spender of the tokens.
+ * @param {value} - The amount of token allowance to spend.
  * @return {[]} - None.
  */
 export circuit _spendAllowance(

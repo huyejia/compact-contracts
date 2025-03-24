@@ -2,17 +2,12 @@ import { it, describe, expect } from '@jest/globals';
 import { ERC20Mock } from './erc20-setup.js';
 import { NetworkId, setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import { MaybeString } from './types.js';
-import { pad, createCoinInfo } from './utils';
-import { sampleContractAddress } from '@midnight-ntwrk/ledger';
-import { toHex } from '@midnight-ntwrk/midnight-js-utils';
-import { encodeTokenType, encodeCoinInfo, encodeContractAddress, decodeCoinInfo, decodeTokenType, decodeContractAddress, tokenType } from '@midnight-ntwrk/onchain-runtime';
-
+import * as utils from './utils.js';
 
 //
 // Test vals
 //
 
-const NONCE: Uint8Array = pad('NONCE', 32);
 const NO_STRING: MaybeString = {
   is_some: false,
   value: ''
@@ -26,32 +21,32 @@ const SYMBOL: MaybeString = {
   value: "SYMBOL"
 };
 const DECIMALS: bigint = 18n;
-const DOMAIN: Uint8Array = pad('ERC20', 32);
 
 const AMOUNT: bigint = BigInt(250);
 const MAX_UINT64 = BigInt(2**64) - BigInt(1);
+const MAX_UINT256 = BigInt(2**256) - BigInt(1);
 
+const OWNER = utils.createEitherTestUser('OWNER');
+const RECIPIENT = utils.createEitherTestUser('RECIPIENT');
+const SPENDER = utils.createEitherTestUser('SPENDER');
+const SOME_CONTRACT = utils.createEitherTestContractAddress('SOME_CONTRACT');
 
 //
 // Test
 //
 
 setNetworkId(NetworkId.Undeployed);
-//const token = new ERC20Mock(NONCE, METADATA);
 let token: any;
 
 describe('ERC20', () => {
-  beforeEach(async function () {
-    token = new ERC20Mock(NONCE, NAME, SYMBOL, DECIMALS);
+  beforeEach(() => {
+    token = new ERC20Mock(NAME, SYMBOL, DECIMALS);
   });
 
   describe('initialize', () => {
     it('initializes the correct state', () => {
       const state = token.getLedger();
 
-      expect(state.counter).toEqual(0n);
-      expect(state.nonce).toEqual(NONCE);
-      expect(state.domain).toEqual(DOMAIN);
       expect(state.totalSupply).toEqual(0n);
       expect(state.name).toEqual(NAME);
       expect(state.symbol).toEqual(SYMBOL);
@@ -59,15 +54,11 @@ describe('ERC20', () => {
     });
 
     it('initializes no metadata state', () => {
-      const zeroNonce = pad('0', 32);
       const noDecimals: bigint = 0n;
 
-      const token = new ERC20Mock(zeroNonce, NO_STRING, NO_STRING, noDecimals);
+      const token = new ERC20Mock(NO_STRING, NO_STRING, noDecimals);
       const state = token.getLedger();
 
-      expect(state.counter).toEqual(0n);
-      expect(state.nonce).toEqual(zeroNonce);
-      expect(state.domain).toEqual(DOMAIN);
       expect(state.totalSupply).toEqual(0n);
       expect(state.name).toEqual(NO_STRING);
       expect(state.symbol).toEqual(NO_STRING);
@@ -75,48 +66,126 @@ describe('ERC20', () => {
     });
   });
 
-  // tmp - mintToCaller
+  describe('approve', () => {
+    // TODO: change caller context to test IERC20 interface
+    it.skip('should approve', () => {
+      const initAllowance = token.allowance(OWNER, SPENDER);
+      expect(initAllowance).toEqual(0n);
+
+      token._mint(OWNER, AMOUNT);
+      token.approve(SPENDER, AMOUNT);
+    });
+  })
+
+  describe('_approve', () => {
+    it('should _approve', () => {
+      const initAllowance = token.allowance(OWNER, SPENDER);
+      expect(initAllowance).toEqual(0n);
+
+      token._approve(OWNER, SPENDER, AMOUNT);
+
+      expect(token.allowance(OWNER, SPENDER)).toEqual(initAllowance + AMOUNT);
+    });
+
+    it('should throw when owner is zero', () => {
+      expect(() => {
+        token._approve(utils.ZERO_KEY, SPENDER, AMOUNT);
+      }).toThrow('ERC20: invalid owner');
+    });
+
+    it('should throw when spender is zero', () => {
+      expect(() => {
+        token._approve(OWNER, utils.ZERO_KEY, AMOUNT);
+      }).toThrow('ERC20: invalid spender');
+    });
+  });
+
+  describe('transferFrom', () => {
+    beforeEach(() => {
+      token._mint(OWNER, AMOUNT);
+    });
+
+    it.skip('should transfer from owner to recipient', () => {
+      const ownerBal = token.balanceOf(OWNER);
+      const recipientBal = token.balanceOf(RECIPIENT);
+
+      token.transferFrom(OWNER, RECIPIENT, AMOUNT);
+    })
+  })
+
+  describe('transfer', () => {
+    beforeEach(() => {
+      token._mint(OWNER, AMOUNT);
+    });
+
+    describe('internal _transfer', () => {
+      it('should _transfer', () => {
+        const ownerBal = token.balanceOf(OWNER);
+        const recipientBal = token.balanceOf(RECIPIENT);
+
+        token._transfer(OWNER, RECIPIENT, AMOUNT);
+
+        expect(token.balanceOf(OWNER)).toEqual(ownerBal - AMOUNT);
+        expect(token.balanceOf(RECIPIENT)).toEqual(recipientBal + AMOUNT);
+
+        // Confirm totalSupply doesn't change
+        expect(token.getLedger().totalSupply).toEqual(AMOUNT);
+      });
+
+      it('throws when _transfer with not enough balance', () => {
+        expect(() => {
+          token._transfer(OWNER, RECIPIENT, AMOUNT + 1n);
+        }).toThrow('ERC20: insufficient balance');
+      });
+    });
+  });
+
   describe('mint', () => {
     it('should mint and update supply', () => {
       const initSupply = token.getLedger().totalSupply;
       expect(initSupply).toEqual(0n);
 
-      const newState = token.mintToCaller(AMOUNT);
-      expect(newState.totalSupply).toEqual(AMOUNT);
-
-      const nextState = token.mintToCaller(AMOUNT);
-      expect(nextState.totalSupply).toEqual(AMOUNT + AMOUNT);
+      token._mint(RECIPIENT, AMOUNT);
+      expect(token.getLedger().totalSupply).toEqual(AMOUNT);
+      expect(token.balanceOf(RECIPIENT)).toEqual(AMOUNT);
     });
 
-    it('should overflow', () => {
-      // Passing in uints > u64:
-      // "CompactError: Error: failed to decode for built-in type u64 after successful typecheck"
-      // Also, the type is u128, but they're overflowing at u64?
-      token.mintToCaller(MAX_UINT64);
+    it('should not mint to zero pubkey', () => {
       expect(() => {
-        token.mintToCaller(BigInt(1))
-      }).toThrow('Error: arithmetic overflow');
+        token._mint(utils.ZERO_KEY, AMOUNT);
+      }).toThrow('ERC20: invalid receiver');
+    });
+
+    it('should not mint to zero contract address', () => {
+      expect(() => {
+        token._mint(utils.ZERO_ADDRESS, AMOUNT);
+      }).toThrow('ERC20: invalid receiver');
     });
   });
 
   describe('burn', () => {
-    //beforeEach(() => {
-    //  token.mintToCaller(AMOUNT);
-    //});
-    it('should mint and burn', () => {
-      //const coinInfo = createCoinInfo(token.nonce, DOMAIN, AMOUNT, token.contractAddress);
-      let res = token.mintToCaller(AMOUNT);
-      //console.log("state info: ", res.info);
-      res = token.mintToCaller(AMOUNT);
-      //console.log("state info: ", res.info.color);
-      const a = {
-        nonce: NONCE,
-        color: res.info.color,
-        value: res.info.value
-      };
-      const f = tokenType(DOMAIN, token.contractAddress);
-      console.log("local tt: ", f);
-      console.log(res.tokenType);
+    beforeEach(() => {
+      token._mint(OWNER, AMOUNT);
+    });
+
+    it('should burn tokens', () => {
+      token._burn(OWNER, 1n);
+
+      const afterBurn = AMOUNT - 1n;
+      expect(token.balanceOf(OWNER)).toEqual(afterBurn);
+      expect(token.getLedger().totalSupply).toEqual(afterBurn)
+    });
+
+    it('should throw when burning from zero', () => {
+      expect(() => {
+        token._burn(utils.ZERO_KEY, AMOUNT);
+      }).toThrow('ERC20: invalid sender');
+    });
+
+    it('should throw when burn amount is greater than balance', () => {
+      expect(() => {
+        token._burn(OWNER, AMOUNT + 1n);
+      }).toThrow('ERC20: insufficient balance');
     });
   });
 });

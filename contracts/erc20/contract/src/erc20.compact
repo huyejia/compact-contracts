@@ -259,7 +259,7 @@ export circuit _spendAllowance(
   // TODO: improve readability of max_u256
   const max_u256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
   if (currentAllowance < max_u256) {
-    assert currentAllowance > value "ERC20: insufficient allowance";
+    assert currentAllowance >= value "ERC20: insufficient allowance";
     _approve(owner, spender, currentAllowance - value as Uint<256>);
   }
 }

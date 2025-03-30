@@ -141,10 +141,9 @@ export circuit _approve(
 ): [] {
   assert !_isZero(owner) "ERC20: invalid owner";
   assert !_isZero(spender) "ERC20: invalid spender";
-  if (!allowances.member(owner) || !allowances.lookup(owner).member(spender)) {
-    const t = default<Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<256>>>;
-    allowances.insert(owner, t);
-    allowances.lookup(owner).insert(spender, default<Uint<256>>);
+  if (!allowances.member(owner)) {
+    // If owner doesn't exist, create and insert a new sub-map directly
+    allowances.insert(owner, default<Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<256>>>);
   }
   allowances.lookup(owner).insert(spender, value);
 }
@@ -237,11 +236,7 @@ export circuit _update(
     totalSupply = totalSupply - value as Uint<256>;
   } else {
     const toBal = balanceOf(to);
-    if (toBal == 0) {
-      balances.insert(to, value);
-    } else {
-      balances.insert(to, toBal + value as Uint<256>);
-    }
+        balances.insert(to, toBal + value as Uint<256>);
   }
 }
 

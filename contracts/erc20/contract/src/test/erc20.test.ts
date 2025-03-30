@@ -113,6 +113,45 @@ describe('ERC20', () => {
     });
   });
 
+  describe('_spendAllowance', () => {
+    describe('spend allowance when not infinite', () => {
+      beforeEach(() => {
+        token._approve(OWNER, SPENDER, AMOUNT);
+        expect(token.allowance(OWNER, SPENDER)).toEqual(AMOUNT);
+      })
+
+      it('spends allowance', () => {
+        token._spendAllowance(OWNER, SPENDER, AMOUNT);
+        expect(token.allowance(OWNER, SPENDER)).toEqual(0n);
+      });
+
+      it('spends partial allowance', () => {
+        const partialAllowance = AMOUNT - 1n;
+        token._spendAllowance(OWNER, SPENDER, partialAllowance);
+        expect(token.allowance(OWNER, SPENDER)).toEqual(1n);
+      });
+
+      it('throws when not enough allowance', () => {
+        expect(() => {
+          token._spendAllowance(OWNER, SPENDER, AMOUNT + 1n);
+        }).toThrow('ERC20: insufficient allowance');
+      });
+    });
+
+    describe('infinite allowance', () => {
+      beforeEach(() => {
+        token._approve(OWNER, SPENDER, MAX_UINT256);
+        expect(token.allowance(OWNER, SPENDER)).toEqual(MAX_UINT256);
+      });
+
+      it('should not subtract from infinite allowance', () => {
+        token._spendAllowance(OWNER, SPENDER, MAX_UINT256 - 1n);
+
+        expect(token.allowance(OWNER, SPENDER)).toEqual(MAX_UINT256);
+      });
+    });
+  });
+
   describe('transferFrom', () => {
     beforeEach(() => {
       token._mint(OWNER, AMOUNT);
@@ -199,6 +238,42 @@ describe('ERC20', () => {
       expect(() => {
         token._burn(OWNER, AMOUNT + 1n);
       }).toThrow('ERC20: insufficient balance');
+    });
+  });
+
+  describe('_update', () => {
+    it('should update from zero to non-zero (mint)', () => {
+      expect(token.getLedger().totalSupply).toEqual(0n);
+      expect(token.balanceOf(OWNER)).toEqual(0n);
+
+      token._update(utils.ZERO_KEY, OWNER, AMOUNT);
+
+      expect(token.getLedger().totalSupply).toEqual(AMOUNT);
+      expect(token.balanceOf(OWNER)).toEqual(AMOUNT);
+    });
+
+    describe('with minted tokens', () => {
+      beforeEach(() => {
+        token._update(utils.ZERO_ADDRESS, OWNER, AMOUNT);
+
+        expect(token.getLedger().totalSupply).toEqual(AMOUNT);
+        expect(token.balanceOf(OWNER)).toEqual(AMOUNT);
+      });
+
+      it('should update from non-zero to zero (burn)', () => {
+        token._update(OWNER, utils.ZERO_ADDRESS, AMOUNT);
+
+        expect(token.getLedger().totalSupply).toEqual(0n);
+        expect(token.balanceOf(OWNER)).toEqual(0n);
+      });
+
+      it('should update from non-zero to non-zero (transfer)', () => {
+        token._update(OWNER, RECIPIENT, AMOUNT - 1n);
+
+        expect(token.getLedger().totalSupply).toEqual(AMOUNT);
+        expect(token.balanceOf(OWNER)).toEqual(1n);
+        expect(token.balanceOf(RECIPIENT)).toEqual(AMOUNT - 1n);
+      });
     });
   });
 });

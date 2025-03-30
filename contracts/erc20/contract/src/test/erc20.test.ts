@@ -87,6 +87,19 @@ describe('ERC20', () => {
       expect(token.allowance(OWNER, SPENDER)).toEqual(initAllowance + AMOUNT);
     });
 
+    it('should approve to a new spender address', () => {
+      token._approve(OWNER, SPENDER, AMOUNT);
+      expect(token.allowance(OWNER, SPENDER)).toEqual(AMOUNT);
+
+      const NEW_SPENDER = utils.createEitherTestUser('NEW_SPENDER');
+      const newAmount = AMOUNT + 200n;
+      expect(token.allowance(OWNER, NEW_SPENDER)).toEqual(0n);
+      token._approve(OWNER, NEW_SPENDER, newAmount);
+
+      expect(token.allowance(OWNER, NEW_SPENDER)).toEqual(newAmount);
+      expect(token.allowance(OWNER, SPENDER)).toEqual(AMOUNT);
+    });
+
     it('should throw when owner is zero', () => {
       expect(() => {
         token._approve(utils.ZERO_KEY, SPENDER, AMOUNT);

@@ -1,5 +1,5 @@
 import { type CircuitContext, QueryContext, sampleContractAddress, constructorContext } from '@midnight-ntwrk/compact-runtime';
-import { Contract, type Ledger, ledger, ZswapCoinPublicKey, ContractAddress, Either } from '../managed/erc20/contract/index.cjs';
+import { Contract, type Ledger, ledger, ZswapCoinPublicKey, ContractAddress, Either } from '../artifacts/erc20/contract/index.cjs';
 import { type ERC20PrivateState, witnesses } from '../witnesses.js';
 import { MaybeString } from './types.js';
 

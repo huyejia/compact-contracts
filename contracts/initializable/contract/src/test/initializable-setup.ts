@@ -1,5 +1,5 @@
 import { type CircuitContext, QueryContext, sampleContractAddress, constructorContext } from '@midnight-ntwrk/compact-runtime';
-import { Contract, type Ledger, ledger } from '../managed/initializable/contract/index.cjs';
+import { Contract, type Ledger, ledger } from '../artifacts/initializable/contract/index.cjs';
 import { type InitializablePrivateState, witnesses } from '../witnesses.js';
 
 export class InitializableMock {

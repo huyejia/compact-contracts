@@ -22,6 +22,7 @@ result
 dist/
 gen/
 managed/
+artifacts/
 midnight-level-db
 compactc
 

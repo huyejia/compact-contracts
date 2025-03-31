@@ -1,2 +1,2 @@
-export * from './managed/initializable/contract/index.cjs';
+export * from './artifacts/initializable/contract/index.cjs';
 export * from './witnesses.js';

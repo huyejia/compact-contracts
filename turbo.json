@@ -15,7 +15,7 @@
       "env": ["COMPACT_HOME"],
       "inputs": ["src/**/*.compact"],
       "outputMode": "new-only",
-      "outputs": ["src/managed/**", "src/gen/**", "gen/**"]
+      "outputs": ["src/artifacts/**", "src/gen/**", "gen/**"]
     },
     "build": {
       "dependsOn": ["^build", "compact", "typecheck"],

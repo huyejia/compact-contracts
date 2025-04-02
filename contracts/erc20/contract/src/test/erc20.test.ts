@@ -3,6 +3,7 @@ import { ERC20Mock } from './erc20-setup.js';
 import { NetworkId, setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import { MaybeString } from './types.js';
 import * as utils from './utils.js';
+import { MAX_FIELD } from '@midnight-ntwrk/compact-runtime';
 
 //
 // Test vals
@@ -24,7 +25,7 @@ const DECIMALS: bigint = 18n;
 
 const AMOUNT: bigint = BigInt(250);
 const MAX_UINT64 = BigInt(2**64) - BigInt(1);
-const MAX_UINT256 = BigInt(2**256) - BigInt(1);
+const MAX_UINT128 = BigInt(2**128) - BigInt(1);
 
 const OWNER = utils.createEitherTestUser('OWNER');
 const RECIPIENT = utils.createEitherTestUser('RECIPIENT');
@@ -140,14 +141,14 @@ describe('ERC20', () => {
 
     describe('infinite allowance', () => {
       beforeEach(() => {
-        token._approve(OWNER, SPENDER, MAX_UINT256);
-        expect(token.allowance(OWNER, SPENDER)).toEqual(MAX_UINT256);
+        token._approve(OWNER, SPENDER, MAX_UINT128);
+        expect(token.allowance(OWNER, SPENDER)).toEqual(MAX_UINT128);
       });
 
       it('should not subtract from infinite allowance', () => {
-        token._spendAllowance(OWNER, SPENDER, MAX_UINT256 - 1n);
+        token._spendAllowance(OWNER, SPENDER, MAX_UINT128 - 1n);
 
-        expect(token.allowance(OWNER, SPENDER)).toEqual(MAX_UINT256);
+        expect(token.allowance(OWNER, SPENDER)).toEqual(MAX_UINT128);
       });
     });
   });

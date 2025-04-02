@@ -2,14 +2,17 @@
 
 pragma language_version >= 0.14.0;
 
+module ERC20 {
+
+
 import CompactStandardLibrary;
 
 export { ZswapCoinPublicKey, ContractAddress, Either, Maybe };
 
 /// Public state
-export sealed ledger name: Maybe<Opaque<"string">>;
-export sealed ledger symbol: Maybe<Opaque<"string">>;
-export sealed ledger decimals: Uint<8>;
+export ledger name: Maybe<Opaque<"string">>;
+export ledger symbol: Maybe<Opaque<"string">>;
+export ledger decimals: Uint<8>;
 export ledger totalSupply: Uint<128>;
 export ledger balances: Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>;
 export ledger allowances: Map<Either<ZswapCoinPublicKey, ContractAddress>, Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>>;
@@ -22,11 +25,11 @@ export ledger allowances: Map<Either<ZswapCoinPublicKey, ContractAddress>, Map<E
  * @param _symbol - The symbol of the token.
  * @param _decimals - The number of decimals used to get the user representation.
  */
-constructor(
+export circuit initializer(
   _name: Maybe<Opaque<"string">>,
   _symbol: Maybe<Opaque<"string">>,
   _decimals:Uint<8>
-) {
+): [] {
   name = _name;
   symbol = _symbol;
   decimals = _decimals;
@@ -278,4 +281,6 @@ export pure circuit _isZero(keyOrAddress: Either<ZswapCoinPublicKey, ContractAdd
   } else {
     return keyOrAddress == right<ZswapCoinPublicKey, ContractAddress>(ContractAddress{ zero });
   }
+}
+
 }

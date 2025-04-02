@@ -170,7 +170,7 @@ export circuit _transfer(
 }
 
 /**
- * @description Creates a `value` amount of tokens and assigne them to `account`,
+ * @description Creates a `value` amount of tokens and assigns them to `account`,
  * by transferring it from the zero address. Relies on the `update` mechanism.
  *
  * @param {account} - The recipient of tokens minted.

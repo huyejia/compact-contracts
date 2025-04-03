@@ -6,28 +6,64 @@ module ERC20 {
   import CompactStandardLibrary;
 
   /// Public state
-  export ledger name: Maybe<Opaque<"string">>;
-  export ledger symbol: Maybe<Opaque<"string">>;
-  export ledger decimals: Uint<8>;
-  export ledger totalSupply: Uint<128>;
-  export ledger balances: Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>;
-  export ledger allowances: Map<Either<ZswapCoinPublicKey, ContractAddress>, Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>>;
+  export ledger _name: Maybe<Opaque<"string">>;
+  export ledger _symbol: Maybe<Opaque<"string">>;
+  export ledger _decimals: Uint<8>;
+  export ledger _totalSupply: Uint<128>;
+  export ledger _balances: Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>;
+  export ledger _allowances: Map<Either<ZswapCoinPublicKey, ContractAddress>, Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>>;
 
   /**
    * @description Initializes the contract by setting the name, symbol, and decimals.
    *
-   * @param _name - The name of the token.
-   * @param _symbol - The symbol of the token.
-   * @param _decimals - The number of decimals used to get the user representation.
+   * @param name_ - The name of the token.
+   * @param symbol_ - The symbol of the token.
+   * @param decimals_ - The number of decimals used to get the user representation.
    */
   export circuit initializer(
-    _name: Maybe<Opaque<"string">>,
-    _symbol: Maybe<Opaque<"string">>,
-    _decimals:Uint<8>
+    name_: Maybe<Opaque<"string">>,
+    symbol_: Maybe<Opaque<"string">>,
+    decimals_:Uint<8>
   ): [] {
-    name = _name;
-    symbol = _symbol;
-    decimals = _decimals;
+    _name = name_;
+    _symbol = symbol_;
+    _decimals = decimals_;
+  }
+
+  /**
+   * @description Returns the token name.
+   *
+   * @return {Maybe<Opaque<"string">>} - The token name.
+   */
+  export circuit name(): Maybe<Opaque<"string">> {
+    return _name;
+  }
+
+  /**
+   * @description Returns the symbol of the token.
+   *
+   * @return {Maybe<Opaque<"string">>} - The token name.
+   */
+  export circuit symbol(): Maybe<Opaque<"string">> {
+    return _symbol;
+  }
+
+  /**
+   * @description Returns the number of decimals used to get its user representation.
+   *
+   * @return {Uint<8>} - The account's token balance.
+   */
+  export circuit decimals(): Uint<8> {
+    return _decimals;
+  }
+
+  /**
+   * @description Returns the value of tokens in existence.
+   *
+   * @return {Uint<128>} - The total supply of tokens.
+   */
+  export circuit totalSupply(): Uint<128> {
+    return _totalSupply;
   }
 
   /**
@@ -39,11 +75,11 @@ module ERC20 {
    * @return {Uint<128>} - The account's token balance.
    */
   export circuit balanceOf(account: Either<ZswapCoinPublicKey, ContractAddress>): Uint<128> {
-    if (!balances.member(account)) {
+    if (!_balances.member(account)) {
       return 0;
     }
 
-    return balances.lookup(account);
+    return _balances.lookup(account);
   }
 
   /**
@@ -60,11 +96,11 @@ module ERC20 {
     owner: Either<ZswapCoinPublicKey, ContractAddress>,
     spender: Either<ZswapCoinPublicKey, ContractAddress>
   ): Uint<128> {
-    if (!allowances.member(owner) || !allowances.lookup(owner).member(spender)) {
+    if (!_allowances.member(owner) || !_allowances.lookup(owner).member(spender)) {
       return 0;
     }
 
-    return allowances.lookup(owner).lookup(spender);
+    return _allowances.lookup(owner).lookup(spender);
   }
 
   /**
@@ -139,11 +175,11 @@ module ERC20 {
   ): [] {
     assert !_isZero(owner) "ERC20: invalid owner";
     assert !_isZero(spender) "ERC20: invalid spender";
-    if (!allowances.member(owner)) {
+    if (!_allowances.member(owner)) {
       // If owner doesn't exist, create and insert a new sub-map directly
-      allowances.insert(owner, default<Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>>);
+      _allowances.insert(owner, default<Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>>);
     }
-    allowances.lookup(owner).insert(spender, value);
+    _allowances.lookup(owner).insert(spender, value);
   }
 
   /**
@@ -222,19 +258,19 @@ module ERC20 {
   ): [] {
     if (_isZero(from)) {
       // Mint
-      totalSupply = totalSupply + value as Uint<128>;
+      _totalSupply = _totalSupply + value as Uint<128>;
     } else {
       const fromBal = balanceOf(from);
       assert fromBal >= value "ERC20: insufficient balance";
-      balances.insert(from, fromBal - value as Uint<128>);
+      _balances.insert(from, fromBal - value as Uint<128>);
     }
 
     if (_isZero(to)) {
       // Burn
-      totalSupply = totalSupply - value as Uint<128>;
+      _totalSupply = _totalSupply - value as Uint<128>;
     } else {
       const toBal = balanceOf(to);
-          balances.insert(to, toBal + value as Uint<128>);
+          _balances.insert(to, toBal + value as Uint<128>);
     }
   }
 
@@ -253,9 +289,9 @@ module ERC20 {
     value: Uint<128>
   ): [] {
     // TODO: Look into improving design so we're not checking allowance member twice (here and in `_approve`)
-    assert (allowances.member(owner) && allowances.lookup(owner).member(spender)) "ERC20: insufficient allowance";
+    assert (_allowances.member(owner) && _allowances.lookup(owner).member(spender)) "ERC20: insufficient allowance";
 
-    const currentAllowance = allowances.lookup(owner).lookup(spender);
+    const currentAllowance = _allowances.lookup(owner).lookup(spender);
     // TODO: improve readability of max_u128
     const max_u128 = 340282366920938463463374607431768211455;
     if (currentAllowance < max_u128) {

@@ -37,18 +37,18 @@ describe('ERC20', () => {
     it('should initialize metadata', () => {
       token = new ERC20ContractSimulator(NAME, SYMBOL, DECIMALS);
 
-      expect(token.getCurrentPublicState().eRC20Name).toEqual(NAME);
-      expect(token.getCurrentPublicState().eRC20Symbol).toEqual(SYMBOL);
-      expect(token.getCurrentPublicState().eRC20Decimals).toEqual(DECIMALS);
+      expect(token.getCurrentPublicState().eRC20_Name).toEqual(NAME);
+      expect(token.getCurrentPublicState().eRC20_Symbol).toEqual(SYMBOL);
+      expect(token.getCurrentPublicState().eRC20_Decimals).toEqual(DECIMALS);
     });
 
     it('should initialize empty metadata', () => {
       const NO_DECIMALS = 0n;
       token = new ERC20ContractSimulator(NO_STRING, NO_STRING, NO_DECIMALS);
 
-      expect(token.getCurrentPublicState().eRC20Name).toEqual(NO_STRING);
-      expect(token.getCurrentPublicState().eRC20Symbol).toEqual(NO_STRING);
-      expect(token.getCurrentPublicState().eRC20Decimals).toEqual(NO_DECIMALS);
+      expect(token.getCurrentPublicState().eRC20_Name).toEqual(NO_STRING);
+      expect(token.getCurrentPublicState().eRC20_Symbol).toEqual(NO_STRING);
+      expect(token.getCurrentPublicState().eRC20_Decimals).toEqual(NO_DECIMALS);
     });
   });
 
@@ -76,7 +76,7 @@ describe('ERC20', () => {
     });
 
     afterEach(() => {
-      expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(AMOUNT);
+      expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(AMOUNT);
     });
 
     it('should transfer partial', () => {
@@ -161,7 +161,7 @@ describe('ERC20', () => {
     });
 
     afterEach(() => {
-      expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(AMOUNT);
+      expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(AMOUNT);
     });
 
     it('should transferFrom spender (partial)', () => {
@@ -256,7 +256,7 @@ describe('ERC20', () => {
     });
 
     afterEach(() => {
-      expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(AMOUNT);
+      expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(AMOUNT);
     });
 
     it('should update balances (partial)', () => {
@@ -270,13 +270,13 @@ describe('ERC20', () => {
 
   describe('_mint', () => {
     it('should mint and update supply', () => {
-      const initSupply = token.getCurrentPublicState().eRC20TotalSupply;
+      const initSupply = token.getCurrentPublicState().eRC20_TotalSupply;
       expect(initSupply).toEqual(0n);
 
       token._mint(Z_RECIPIENT, AMOUNT);
-      expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(AMOUNT);
+      expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(AMOUNT);
       expect(token.balanceOf(Z_RECIPIENT)).toEqual(AMOUNT);
-      expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(AMOUNT);
+      expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(AMOUNT);
     });
 
     it('should not mint to zero pubkey', () => {
@@ -302,7 +302,7 @@ describe('ERC20', () => {
 
       const afterBurn = AMOUNT - 1n;
       expect(token.balanceOf(Z_OWNER)).toEqual(afterBurn);
-      expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(afterBurn)
+      expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(afterBurn)
     });
 
     it('should throw when burning from zero', () => {
@@ -320,12 +320,12 @@ describe('ERC20', () => {
 
   describe('_update', () => {
     it('should update from zero to non-zero (mint)', () => {
-      expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(0n);
+      expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(0n);
       expect(token.balanceOf(Z_OWNER)).toEqual(0n);
 
       token._update(utils.ZERO_KEY, Z_OWNER, AMOUNT);
 
-      expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(AMOUNT);
+      expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(AMOUNT);
       expect(token.balanceOf(Z_OWNER)).toEqual(AMOUNT);
     });
 
@@ -333,21 +333,21 @@ describe('ERC20', () => {
       beforeEach(() => {
         token._update(utils.ZERO_ADDRESS, Z_OWNER, AMOUNT);
 
-        expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(AMOUNT);
+        expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(AMOUNT);
         expect(token.balanceOf(Z_OWNER)).toEqual(AMOUNT);
       });
 
       it('should update from non-zero to zero (burn)', () => {
         token._update(Z_OWNER, utils.ZERO_ADDRESS, AMOUNT);
 
-        expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(0n);
+        expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(0n);
         expect(token.balanceOf(Z_OWNER)).toEqual(0n);
       });
 
       it('should update from non-zero to non-zero (transfer)', () => {
         token._update(Z_OWNER, Z_RECIPIENT, AMOUNT - 1n);
 
-        expect(token.getCurrentPublicState().eRC20TotalSupply).toEqual(AMOUNT);
+        expect(token.getCurrentPublicState().eRC20_TotalSupply).toEqual(AMOUNT);
         expect(token.balanceOf(Z_OWNER)).toEqual(1n);
         expect(token.balanceOf(Z_RECIPIENT)).toEqual(AMOUNT - 1n);
       });

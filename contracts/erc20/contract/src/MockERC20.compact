@@ -8,7 +8,7 @@ import ERC20 prefix ERC20_;
 
 export { ZswapCoinPublicKey, ContractAddress, Either, Maybe };
 // Export public state
-export { ERC20_name, ERC20_symbol, ERC20_decimals, ERC20_totalSupply, ERC20_balances, ERC20_allowances };
+export { ERC20__name, ERC20__symbol, ERC20__decimals, ERC20__totalSupply, ERC20__balances, ERC20__allowances };
 
 constructor(
   _name: Maybe<Opaque<"string">>,
@@ -16,6 +16,22 @@ constructor(
   _decimals:Uint<8>
 ) {
   ERC20_initializer(_name, _symbol, _decimals);
+}
+
+export circuit name(): Maybe<Opaque<"string">> {
+  return ERC20_name();
+}
+
+export circuit symbol(): Maybe<Opaque<"string">> {
+  return ERC20_symbol();
+}
+
+export circuit decimals(): Uint<8> {
+  return ERC20_decimals();
+}
+
+export circuit totalSupply(): Uint<128> {
+  return ERC20_totalSupply();
 }
 
 export circuit balanceOf(account: Either<ZswapCoinPublicKey, ContractAddress>): Uint<128> {

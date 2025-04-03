@@ -87,12 +87,44 @@ export class ERC20ContractSimulator
   }
 
   /**
+   * @description Returns the token name.
+   * @returns The token name.
+   */
+  public name(): MaybeString {
+    return this.contract.impureCircuits.name(this.circuitContext).result;
+  }
+
+  /**
+   * @description Returns the symbol of the token.
+   * @returns The token name.
+   */
+  public symbol(): MaybeString {
+    return this.contract.impureCircuits.symbol(this.circuitContext).result;
+  }
+
+  /**
+   * @description Returns the number of decimals used to get its user representation.
+   * @returns The account's token balance.
+   */
+  public decimals(): bigint {
+    return this.contract.impureCircuits.decimals(this.circuitContext).result;
+  }
+
+  /**
+   * @description Returns the value of tokens in existence.
+   * @returns The total supply of tokens.
+   */
+  public totalSupply(): bigint {
+    return this.contract.impureCircuits.totalSupply(this.circuitContext).result;
+  }
+
+  /**
    * @description Returns the value of tokens owned by `account`.
    * @param account The public key or contract address to query.
    * @returns The account's token balance.
    */
   public balanceOf(account: Either<ZswapCoinPublicKey, ContractAddress>): bigint {
-    return this.contract.impureCircuits.balanceOf(this.circuitContext,account).result;
+    return this.contract.impureCircuits.balanceOf(this.circuitContext, account).result;
   }
 
   /**

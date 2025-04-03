@@ -173,8 +173,8 @@ module ERC20 {
     spender: Either<ZswapCoinPublicKey, ContractAddress>,
     value: Uint<128>
   ): [] {
-    assert !_isZero(owner) "ERC20: invalid owner";
-    assert !_isZero(spender) "ERC20: invalid spender";
+    assert !isZero(owner) "ERC20: invalid owner";
+    assert !isZero(spender) "ERC20: invalid spender";
     if (!_allowances.member(owner)) {
       // If owner doesn't exist, create and insert a new sub-map directly
       _allowances.insert(owner, default<Map<Either<ZswapCoinPublicKey, ContractAddress>, Uint<128>>>);
@@ -197,8 +197,8 @@ module ERC20 {
     to: Either<ZswapCoinPublicKey, ContractAddress>,
     value: Uint<128>
   ): [] {
-    assert !_isZero(from) "ERC20: invalid sender";
-    assert !_isZero(to) "ERC20: invalid receiver";
+    assert !isZero(from) "ERC20: invalid sender";
+    assert !isZero(to) "ERC20: invalid receiver";
 
     _update(from, to, value);
   }
@@ -215,7 +215,7 @@ module ERC20 {
     account: Either<ZswapCoinPublicKey, ContractAddress>,
     value: Uint<128>
   ): [] {
-    assert !_isZero(account) "ERC20: invalid receiver";
+    assert !isZero(account) "ERC20: invalid receiver";
     // Using the contract variant of 0
     // TODO: Look into if this matters
     const zero_address = right<ZswapCoinPublicKey, ContractAddress>(ContractAddress{ pad(32, "") });
@@ -235,7 +235,7 @@ module ERC20 {
     account: Either<ZswapCoinPublicKey, ContractAddress>,
     value: Uint<128>
   ): [] {
-    assert !_isZero(account) "ERC20: invalid sender";
+    assert !isZero(account) "ERC20: invalid sender";
     // Using the contract variant of 0
     // TODO: Look into if this matters
     const zero_address = right<ZswapCoinPublicKey, ContractAddress>(ContractAddress{ pad(32, "") });
@@ -256,7 +256,7 @@ module ERC20 {
     to: Either<ZswapCoinPublicKey, ContractAddress>,
     value: Uint<128>
   ): [] {
-    if (_isZero(from)) {
+    if (isZero(from)) {
       // Mint
       _totalSupply = _totalSupply + value as Uint<128>;
     } else {
@@ -265,7 +265,7 @@ module ERC20 {
       _balances.insert(from, fromBal - value as Uint<128>);
     }
 
-    if (_isZero(to)) {
+    if (isZero(to)) {
       // Burn
       _totalSupply = _totalSupply - value as Uint<128>;
     } else {
@@ -306,7 +306,7 @@ module ERC20 {
    * @param {keyOrAddress} - The target value to check, either a ZswapCoinPublicKey or a ContractAddress.
    * @return {Boolean} - Returns true if `keyOrAddress` is zero.
    */
-  export pure circuit _isZero(keyOrAddress: Either<ZswapCoinPublicKey, ContractAddress>): Boolean {
+  export pure circuit isZero(keyOrAddress: Either<ZswapCoinPublicKey, ContractAddress>): Boolean {
     const zero = pad(32, "");
 
     if (keyOrAddress.is_left) {

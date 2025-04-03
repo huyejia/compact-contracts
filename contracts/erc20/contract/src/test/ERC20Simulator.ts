@@ -14,14 +14,10 @@ import {
     Either,
     ZswapCoinPublicKey,
     ContractAddress,
-  } from '../../artifacts/MockERC20/contract/index.cjs'; // Combined imports
-import { MaybeString } from '../types.js';
-
-  import type { IContractSimulator } from '../../types';
-  import {
-    ERC20PrivateState,
-    ERC20Witnesses
-  } from '../../witnesses';
+  } from './../artifacts/MockERC20/contract/index.cjs'; // Combined imports
+import { MaybeString } from './types.js';
+import type { IContractSimulator } from './../types';
+import { ERC20PrivateState, ERC20Witnesses } from './../witnesses';
 
   /**
    * @description A simulator implementation of an erc20 contract for testing purposes.
@@ -90,31 +86,6 @@ import { MaybeString } from '../types.js';
       return this.circuitContext.originalState;
     }
 
-    /**
-     * @description Grants a role to a user, updating the circuit context.
-     * @param user - The public key of the user to grant the role to.
-     * @param role - The role to grant (e.g., Admin, Lp, Trader, None).
-     * @param sender - Optional sender public key to set the local Zswap state.
-     * @returns The updated circuit context after granting the role.
-     */
-    //public grantRole(
-    //  user: ZswapCoinPublicKey,
-    //  role: AccessControl_Role,
-    //  sender?: CoinPublicKey,
-    //): CircuitContext<ERC20PrivateState> {
-    //  this.circuitContext = this.contract.impureCircuits.grantRole(
-    //    {
-    //      ...this.circuitContext,
-    //      currentZswapLocalState: sender
-    //        ? emptyZswapLocalState(sender)
-    //        : this.circuitContext.currentZswapLocalState,
-    //    },
-    //    user,
-    //    role,
-    //  ).context;
-    //  return this.circuitContext;
-    //}
-
   public balanceOf(account: Either<ZswapCoinPublicKey, ContractAddress>, sender?: CoinPublicKey): bigint {
     const res = this.contract.impureCircuits.balanceOf({
       ...this.circuitContext,
@@ -125,7 +96,6 @@ import { MaybeString } from '../types.js';
         account
     );
     this.circuitContext = res.context;
-    //return [res.context, res.result];
     return res.result;
   }
 
@@ -144,93 +114,93 @@ import { MaybeString } from '../types.js';
     ).result;
   }
 
-  //public transfer(to: Either<ZswapCoinPublicKey, ContractAddress>, value: bigint, sender?: CoinPublicKey): boolean {
-  //  //return this.contract.impureCircuits.transfer(this.circuitContext, to, value).result;
-  //  return this.contract.impureCircuits.transfer({
-  //      ...this.circuitContext,
-  //      currentZswapLocalState: sender
-  //        ? emptyZswapLocalState(sender)
-  //        : this.circuitContext.currentZswapLocalState,
-  //  }, to, value
-  //  ).result
-  //}
-
-  public transfer(to: Either<ZswapCoinPublicKey, ContractAddress>, value: bigint, sender?: CoinPublicKey): CircuitContext<ERC20PrivateState> {
-    //return this.contract.impureCircuits.transfer(this.circuitContext, to, value).result;
-    return this.contract.impureCircuits.transfer({
+  public transfer(to: Either<ZswapCoinPublicKey, ContractAddress>, value: bigint, sender?: CoinPublicKey): boolean {
+    const res = this.contract.impureCircuits.transfer({
         ...this.circuitContext,
         currentZswapLocalState: sender
           ? emptyZswapLocalState(sender)
           : this.circuitContext.currentZswapLocalState,
-    }, to, value
-    ).context
+        }, to, value
+    );
+
+    this.circuitContext = res.context;
+    return res.result;
   }
 
   public transferFrom(
     from: Either<ZswapCoinPublicKey, ContractAddress>,
     to: Either<ZswapCoinPublicKey, ContractAddress>,
-    value: bigint
+    value: bigint,
+    sender?: CoinPublicKey
   ): boolean {
-    return this.contract.impureCircuits.transferFrom(this.circuitContext, from, to, value).result;
+    const res = this.contract.impureCircuits.transferFrom({
+        ...this.circuitContext,
+        currentZswapLocalState: sender
+          ? emptyZswapLocalState(sender)
+          : this.circuitContext.currentZswapLocalState,
+        },
+        from, to, value
+    );
+
+    this.circuitContext = res.context;
+    return res.result;
   }
 
   public approve(spender: Either<ZswapCoinPublicKey, ContractAddress>, value: bigint, sender?: CoinPublicKey): boolean {
-    //return this.contract.impureCircuits.approve(this.circuitContext, spender, value).result;
-    return this.contract.impureCircuits.approve({
-            ...this.circuitContext,
-            currentZswapLocalState: sender
-              ? emptyZswapLocalState(sender)
-              : this.circuitContext.currentZswapLocalState,
-    },
+    const res = this.contract.impureCircuits.approve({
+        ...this.circuitContext,
+        currentZswapLocalState: sender
+          ? emptyZswapLocalState(sender)
+          : this.circuitContext.currentZswapLocalState,
+        },
         spender, value
-    ).result;
+    );
+
+    this.circuitContext = res.context;
+    return res.result;
   }
 
+  ///
+  /// Internal
+  ///
+
+  /**
+   * 
+   * @param owner 
+   * @param spender 
+   * @param value 
+   * @returns 
+   */
   public _approve(
     owner: Either<ZswapCoinPublicKey, ContractAddress>,
     spender: Either<ZswapCoinPublicKey, ContractAddress>,
     value: bigint
   ) {
     this.circuitContext = this.contract.impureCircuits._approve(this.circuitContext, owner, spender, value).context;
-    return ledger(this.circuitContext.transactionContext.state);
   }
 
   public _transfer(
     from: Either<ZswapCoinPublicKey, ContractAddress>,
     to: Either<ZswapCoinPublicKey, ContractAddress>,
-    value: bigint
+    value: bigint,
   ) {
     this.circuitContext = this.contract.impureCircuits._transfer(this.circuitContext, from, to, value).context;
-    return ledger(this.circuitContext.transactionContext.state);
   }
 
-  public _mint(account: Either<ZswapCoinPublicKey, ContractAddress>, value: bigint, sender?: CoinPublicKey): Ledger {
-    //this.circuitContext = this.contract.impureCircuits._mint(this.circuitContext, account, value).context;
-    //return this.circuitContext;
-    //return ledger(this.circuitContext.transactionContext.state);
-
-    this.circuitContext = this.contract.impureCircuits._mint({
-        ...this.circuitContext,
-        currentZswapLocalState: sender
-          ? emptyZswapLocalState(sender)
-          : this.circuitContext.currentZswapLocalState,
-},
-    account, value
-).context;
-return ledger(this.circuitContext.transactionContext.state);
+  public _mint(account: Either<ZswapCoinPublicKey, ContractAddress>, value: bigint) {
+    this.circuitContext = this.contract.impureCircuits._mint(this.circuitContext, account, value).context;
   }
 
   public _burn(account: Either<ZswapCoinPublicKey, ContractAddress>, value: bigint) {
     this.circuitContext = this.contract.impureCircuits._burn(this.circuitContext, account, value).context;
-    return ledger(this.circuitContext.transactionContext.state);
   }
+
   public _update(
     from: Either<ZswapCoinPublicKey, ContractAddress>,
     to: Either<ZswapCoinPublicKey, ContractAddress>,
     value: bigint
   ) {
     this.circuitContext = this.contract.impureCircuits._update(this.circuitContext, from, to, value).context;
-    return ledger(this.circuitContext.transactionContext.state);
   }
 
   public _spendAllowance(
@@ -239,7 +209,6 @@ return ledger(this.circuitContext.transactionContext.state);
     value: bigint
   ) {
     this.circuitContext = this.contract.impureCircuits._spendAllowance(this.circuitContext, owner, spender, value).context;
-    return ledger(this.circuitContext.transactionContext.state);
   }
 
   public _isZero(address: Either<ZswapCoinPublicKey, ContractAddress>): boolean {

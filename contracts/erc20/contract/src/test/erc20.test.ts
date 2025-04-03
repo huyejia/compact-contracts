@@ -354,15 +354,15 @@ describe('ERC20', () => {
     });
   });
 
-  describe('_isZero', () => {
+  describe('isZero', () => {
     it('should return zero for the zero address', () => {
-      expect(token._isZero(utils.ZERO_KEY)).toBeTruthy;
-      expect(token._isZero(utils.ZERO_ADDRESS)).toBeTruthy;
+      expect(token.isZero(utils.ZERO_KEY)).toBeTruthy;
+      expect(token.isZero(utils.ZERO_ADDRESS)).toBeTruthy;
     });
 
     it('should not return zero for nonzero addresses', () => {
-      expect(token._isZero(Z_OWNER)).toBeFalsy;
-      expect(token._isZero(SOME_CONTRACT)).toBeFalsy;
+      expect(token.isZero(Z_OWNER)).toBeFalsy;
+      expect(token.isZero(SOME_CONTRACT)).toBeFalsy;
     });
   });
 });

@@ -302,7 +302,7 @@ export class ERC20ContractSimulator
    * @param keyOrAddress The target value to check, either a ZswapCoinPublicKey or a ContractAddress.
    * @returns Returns true if `keyOrAddress` is zero.
    */
-  public _isZero(keyOrAddress: Either<ZswapCoinPublicKey, ContractAddress>): boolean {
-    return this.contract.circuits._isZero(this.circuitContext, keyOrAddress).result;
+  public isZero(keyOrAddress: Either<ZswapCoinPublicKey, ContractAddress>): boolean {
+    return this.contract.circuits.isZero(this.circuitContext, keyOrAddress).result;
   }
 }

@@ -5,8 +5,6 @@ pragma language_version >= 0.14.0;
 module ERC20 {
   import CompactStandardLibrary;
 
-  export { ZswapCoinPublicKey, ContractAddress, Either, Maybe };
-
   /// Public state
   export ledger name: Maybe<Opaque<"string">>;
   export ledger symbol: Maybe<Opaque<"string">>;

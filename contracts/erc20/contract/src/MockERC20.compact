@@ -7,8 +7,6 @@ import CompactStandardLibrary;
 import ERC20 prefix ERC20_;
 
 export { ZswapCoinPublicKey, ContractAddress, Either, Maybe };
-// Export public state
-export { ERC20__name, ERC20__symbol, ERC20__decimals, ERC20__totalSupply, ERC20__balances, ERC20__allowances };
 
 constructor(
   _name: Maybe<Opaque<"string">>,

@@ -2,8 +2,9 @@
     "packageManager": "yarn@4.1.0",
     "workspaces": [
         "compact",
-        "contracts/initializable/*",
-        "contracts/utils/*"
+        "contracts/erc20/",
+        "contracts/initializable/",
+        "contracts/utils/"
     ],
     "scripts": {
         "compact": "turbo run compact",

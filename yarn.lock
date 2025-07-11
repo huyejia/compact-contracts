@@ -423,9 +423,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openzeppelin-compact/multi-token@workspace:contracts/multitoken":
+"@openzeppelin-compact/multi-token@workspace:contracts/multiToken":
   version: 0.0.0-use.local
-  resolution: "@openzeppelin-compact/multi-token@workspace:contracts/multitoken"
+  resolution: "@openzeppelin-compact/multi-token@workspace:contracts/multiToken"
   dependencies:
     "@openzeppelin-compact/compact": "workspace:^"
     "@types/node": "npm:22.14.0"
@@ -686,11 +686,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22":
-  version: 22.16.2
-  resolution: "@types/node@npm:22.16.2"
+  version: 22.16.3
+  resolution: "@types/node@npm:22.16.3"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/ff15825a699863e54c9669e888b6d12848180f4f0b88cb9dc84c3dc6f91ca2d1d09df38f4f02ba594e70ade6c53d840f090c4817d8df5968df653921095d77b7
+  checksum: 10/b71fe7abf242091e2f303b400b27f677c311b03a3125bf5532e06aff8a4cd41944bcc6f70a0666834e4352228607e676bc8082fa38d3739d3e1460a20d5c51d2
   languageName: node
   linkType: hard
 
@@ -2539,8 +2539,8 @@ __metadata:
   linkType: hard
 
 "vite@npm:^5.0.0 || ^6.0.0 || ^7.0.0-0":
-  version: 7.0.3
-  resolution: "vite@npm:7.0.3"
+  version: 7.0.4
+  resolution: "vite@npm:7.0.4"
   dependencies:
     esbuild: "npm:^0.25.0"
     fdir: "npm:^6.4.6"
@@ -2589,7 +2589,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10/75068d79283e46be98395dd3a42eac9db4c92d550a9458049fc1501eb47944ac4bded55ce304d760f84dc91baf223e4d77069ccb222d2eb468644bed571c11a0
+  checksum: 10/e5609e6b67658d0f4bb807d21290c515e3a1c2e085aa9507404f17d836a5b830d0a8bff36f67a0509361044843c9ccb4a0b7033a511dfb5d1dc5ded49aedaa91
   languageName: node
   linkType: hard
 

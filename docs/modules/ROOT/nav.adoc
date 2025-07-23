@@ -17,3 +17,6 @@
 
 ** xref:ownable.adoc[Ownable]
 *** xref:api/ownable.adoc[API Reference]
+
+** xref:accessControl.adoc[Access Control]
+*** xref:api/accessControl.adoc[API Reference]

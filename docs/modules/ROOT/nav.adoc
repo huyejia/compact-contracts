@@ -20,3 +20,6 @@
 
 ** xref:accessControl.adoc[Access Control]
 *** xref:api/accessControl.adoc[API Reference]
+
+** xref:utils.adoc[Utils]
+*** xref:api/utils.adoc[API Reference]

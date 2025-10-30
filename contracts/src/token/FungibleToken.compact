@@ -116,7 +116,7 @@ module FungibleToken {
    *
    * - Contract is initialized.
    *
-   * @return {Opaque<"string">} - The token name.
+   * @returns {Opaque<"string">} - The token symbol.
    */
   export circuit symbol(): Opaque<"string"> {
     Initializable_assertInitialized();

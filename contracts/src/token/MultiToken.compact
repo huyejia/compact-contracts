@@ -145,7 +145,7 @@ module MultiToken {
    *
    * @param {Either<ZswapCoinPublicKey, ContractAddress>} account - The account balance to query.
    * @param {Uint<128>} id - The token identifier to query.
-   * return {Uint<128>} - The quantity of `id` tokens that `account` owns.
+   * @return {Uint<128>} - The quantity of `id` tokens that `account` owns.
    */
   export circuit balanceOf(account: Either<ZswapCoinPublicKey, ContractAddress>, id: Uint<128>): Uint<128> {
     Initializable_assertInitialized();

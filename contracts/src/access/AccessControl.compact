@@ -129,7 +129,7 @@ module AccessControl {
    * - The caller must not be a ContractAddress
    *
    * @param {Bytes<32>} roleId - The role identifier.
-   * @return {[]} - Empty tuple.
+   * @returns {[]} - Empty tuple.
    */
   export circuit assertOnlyRole(roleId: Bytes<32>): [] {
     _checkRole(roleId, left<ZswapCoinPublicKey,ContractAddress>(ownPublicKey()));
